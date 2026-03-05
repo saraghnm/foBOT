@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Credentials
+config.py
+
+# Logs
+*.log
+
+# State file (contains trade data)
+state.json
+history.json
+
+# doc
+*.docx
+*.pdf
