@@ -34,8 +34,9 @@ def calculate_lot_size(sl_pips):
     pip_value    = get_pip_value()
     lot_size     = risk_amount / (sl_pips * pip_value)
 
-    # Round to 2 decimal places, min 0.01
+    # Round to 2 decimal places, min 0.01, max 1.0 for safety
     lot_size = max(round(lot_size, 2), 0.01)
+    lot_size = min(lot_size, 0.10)  # cap at 1 lot for safety
     return lot_size
 
 

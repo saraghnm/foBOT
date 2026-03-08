@@ -13,3 +13,11 @@ def notify(message):
         })
     except Exception as e:
         print(f"Telegram error: {e}")
+
+def get_updates(offset=None):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
+    params = {"timeout": 10}
+    if offset:
+        params["offset"] = offset
+    response = requests.get(url, params=params)
+    return response.json()
