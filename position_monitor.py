@@ -67,14 +67,16 @@ def _manage_trailing_stop(position):
     open_price = position.price_open
     sl         = position.sl
 
-    current_price = get_price(symbol)
-    if not current_price:
+    bid, ask = get_price(symbol)
+    if not bid:
         return
+    current_price = bid  # use bid for SELL, ask for BUY
 
     # SL distance in pips
     sl_pips = _pips(symbol, abs(open_price - sl)) if sl else 15.0
 
     # Current profit in pips
+    current_price = ask if trade_type == "buy" else bid
     if trade_type == "buy":
         profit_pips = _pips(symbol, current_price - open_price)
         in_profit = current_price > open_price

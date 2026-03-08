@@ -68,15 +68,6 @@ def check_max_positions():
     return len(positions) < MAX_POSITIONS
 
 
-def check_daily_drawdown(daily_pnl):
-    account = get_account_info()
-    if account is None:
-        return False
-    balance     = account["balance"]
-    drawdown_pct = abs(daily_pnl / balance * 100)
-    return drawdown_pct < DAILY_DRAWDOWN_LIMIT
-
-
 def get_trade_parameters(signal, entry_price):
     # Check max positions
     if not check_max_positions():

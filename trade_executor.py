@@ -5,8 +5,6 @@ from config import SYMBOL, MAGIC
 from notifier import notify
 
 
-    
-    
 def place_order(signal, lot_size, entry_price, sl, tp):
     # Order type
     order_type = mt5.ORDER_TYPE_BUY if signal == "BUY" else mt5.ORDER_TYPE_SELL

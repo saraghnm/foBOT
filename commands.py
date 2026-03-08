@@ -147,7 +147,6 @@ def handle_message(text):
             notify(f"⚠️ Trade blocked: {status}")
             return
 
-        from trade_executor import place_order
         emoji = "🟢" if signal == "BUY" else "🔴"
         notify(f"{emoji} Placing {signal} order on {SYMBOL}...")
 

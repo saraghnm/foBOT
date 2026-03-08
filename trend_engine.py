@@ -15,15 +15,12 @@ def get_bias():
     # Calculate SMA(9) and EMA(20)
     df["sma9"]  = ta.trend.sma_indicator(df["close"], window=9)
     df["ema20"] = ta.trend.ema_indicator(df["close"], window=20)
-
-    # Get the last two rows to detect crossover
-    prev = df.iloc[-2]
+    
+    # Get latest candle
     curr = df.iloc[-1]
 
-    sma_now  = curr["sma9"]
-    ema_now  = curr["ema20"]
-    sma_prev = prev["sma9"]
-    ema_prev = prev["ema20"]
+    sma_now = curr["sma9"]
+    ema_now = curr["ema20"]
 
     # Determine bias
     if sma_now > ema_now:
