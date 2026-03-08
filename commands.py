@@ -44,7 +44,7 @@ def handle_message(text):
                 f"🔓 Margin:   ${account['margin_free']:,.2f} free\n"
                 f"━━━━━━━━━━━━━━━\n"
                 f"🕐 Session:  {session[1]}\n"
-                f"⏸ Paused:   {'YES ⚠️' if _paused else 'NO ✅'}\n"
+                f"🤖 Auto-trade: {'PAUSED ⚠️' if _paused else 'ACTIVE ✅'}\n"
                 f"📰 News:     {'FREEZE ⛔ — ' + news_title if frozen else 'Clear ✅'}\n"
                 f"━━━━━━━━━━━━━━━\n"
                 f"📂 Open positions: {len(positions)}\n"
