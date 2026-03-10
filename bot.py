@@ -3,6 +3,8 @@
 # listens for Telegram commands, and runs the auto-trading loop.
 
 import time
+import os
+import atexit
 import threading
 from mt5_client import connect, disconnect
 from notifier import notify, get_updates
@@ -14,9 +16,31 @@ from trade_executor import place_order
 from session_guard import is_active_session
 from news_filter import is_freeze_window
 from config import SYMBOL
+from trade_executor import get_open_positions
+from config import MAX_POSITIONS
 
 # How often the auto-trading loop scans for signals (seconds)
 SCAN_INTERVAL = 60
+STOP_FILE = "STOP"
+
+
+def graceful_shutdown():
+    """Disconnect MT5 and notify on any exit."""
+    try:
+        disconnect()
+        notify("🛑 Forex bot stopped — MT5 disconnected ✅")
+        print("💾 Forex bot shut down cleanly.")
+    except Exception as e:
+        print(f"⚠️ Shutdown error: {e}")
+
+
+# Register shutdown hook
+atexit.register(graceful_shutdown)
+
+
+def should_stop():
+    """Check if the stop signal file exists."""
+    return os.path.exists(STOP_FILE)
 
 
 def auto_trade_loop():
@@ -25,6 +49,9 @@ def auto_trade_loop():
     Every 60 seconds: checks session, news, signal → places trade if all clear.
     """
     while True:
+        if should_stop():
+            break
+
         try:
             if is_paused():
                 time.sleep(SCAN_INTERVAL)
@@ -36,6 +63,10 @@ def auto_trade_loop():
 
             frozen, title, currency = is_freeze_window()
             if frozen:
+                time.sleep(SCAN_INTERVAL)
+                continue
+            
+            if len(get_open_positions()) >= MAX_POSITIONS:
                 time.sleep(SCAN_INTERVAL)
                 continue
 
@@ -105,6 +136,11 @@ def main():
     # ── 6. Main Telegram polling loop ────────────────────────────────────────
     print("✅ Bot is running — listening for Telegram commands...")
     while True:
+        # Check for stop signal
+        if should_stop():
+            print("🛑 Stop signal detected — shutting down gracefully...")
+            break
+
         try:
             updates = get_updates(offset)
             for update in updates.get("result", []):

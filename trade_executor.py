@@ -30,7 +30,7 @@ def place_order(signal, lot_size, entry_price, sl, tp):
         "magic":        MAGIC,
         "comment":      "HalalForexBot",
         "type_time":    mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_FOK,
+        "type_filling": mt5.ORDER_FILLING_IOC,
     }
 
     # Send order
@@ -92,7 +92,7 @@ def close_trade(ticket):
         "magic":        MAGIC,
         "comment":      "HalalForexBot_Close",
         "type_time":    mt5.ORDER_TIME_GTC,
-        "type_filling": mt5.ORDER_FILLING_FOK,
+        "type_filling": mt5.ORDER_FILLING_IOC,
     }
 
     result = mt5.order_send(request)

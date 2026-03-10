@@ -2,34 +2,49 @@
 
 import MetaTrader5 as mt5
 import pandas as pd
+import time
 from config import MT5_LOGIN, MT5_PASSWORD, MT5_SERVER, SYMBOL
 from notifier import notify
 
+MT5_PATH = "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
+MAX_RETRIES = 5
+
 
 def connect():
-    if not mt5.initialize():
-        notify("❌ MT5 failed to initialize!")
-        return False
+    for attempt in range(1, MAX_RETRIES + 1):
+        print(f"🔄 MT5 connection attempt {attempt}/{MAX_RETRIES}...")
 
-    authorized = mt5.login(
-        login=MT5_LOGIN,
-        password=MT5_PASSWORD,
-        server=MT5_SERVER
-    )
+        # Try initialize with full path and credentials
+        result = mt5.initialize(
+            path=MT5_PATH,
+            login=MT5_LOGIN,
+            password=MT5_PASSWORD,
+            server=MT5_SERVER
+        )
 
-    if not authorized:
-        notify(f"❌ MT5 login failed! Error: {mt5.last_error()}")
+        if result:
+            account = mt5.account_info()
+            if account:
+                notify(
+                    f"✅ MT5 Connected!\n"
+                    f"👤 Name: {account.name}\n"
+                    f"💰 Balance: ${account.balance:,.2f}\n"
+                    f"🏦 Server: {MT5_SERVER}\n"
+                    f"🤖 Autotrading: {'✅' if mt5.terminal_info().trade_allowed else '❌'}"
+                )
+                return True
+
+        error = mt5.last_error()
+        print(f"⚠️ Attempt {attempt} failed: {error}")
         mt5.shutdown()
-        return False
 
-    account = mt5.account_info()
-    notify(
-        f"✅ MT5 Connected!\n"
-        f"👤 Name: {account.name}\n"
-        f"💰 Balance: ${account.balance:,.2f}\n"
-        f"🏦 Server: {MT5_SERVER}"
-    )
-    return True
+        if attempt < MAX_RETRIES:
+            wait = attempt * 10  # 10s, 20s, 30s, 40s
+            print(f"⏳ Waiting {wait}s before retry...")
+            time.sleep(wait)
+
+    notify(f"❌ MT5 failed after {MAX_RETRIES} attempts!\nLast error: {mt5.last_error()}")
+    return False
 
 
 def disconnect():
